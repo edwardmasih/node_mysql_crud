@@ -56,4 +56,38 @@ EmployeeModel.createEmployee = (employeeReqData, result) => {
     );
 };
 
+// update employee
+EmployeeModel.updateEmployee = (id, employeeReqData, result)=>{
+    dbConn.query("UPDATE employees SET first_name=?,last_name=?,email=?,phone=?,organization=?,designation=?,salary=? WHERE id = ?", [employeeReqData.first_name,employeeReqData.last_name,employeeReqData.email,employeeReqData.phone,employeeReqData.organization,employeeReqData.designation,employeeReqData.salary, id], (err, res)=>{
+        if(err){
+            console.log('Error while updating the employee');
+            result(null, err);
+        }else{
+            console.log("Employee updated successfully");
+            result(null, res);
+        }
+    });
+}
+
+// delete employee
+EmployeeModel.deleteEmployee = (id, result)=>{
+    // dbConn.query('DELETE FROM employees WHERE id=?', [id], (err, res)=>{
+    //     if(err){
+    //         console.log('Error while deleting the employee');
+    //         result(null, err);
+    //     }else{
+    //         result(null, res);
+    //     }
+    // })
+    dbConn.query("UPDATE employees SET is_deleted=? WHERE id = ?", [1, id], (err, res)=>{
+        if(err){
+            console.log('Error while deleting the employee');
+            result(null, err);
+        }else{
+            console.log("Employee deleted successfully");
+            result(null, res);
+        }
+    });
+}
+
 module.exports = EmployeeModel;

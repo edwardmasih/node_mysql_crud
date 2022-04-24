@@ -12,4 +12,7 @@ router.get('/:id',employeeController.getEmployeeByID)
 // route for creating new employee
 router.post('/add',employeeController.addNewEmployee)
 
+// route for updating employee
+router.post('/update/:id',employeeController.updateEmployee)
+
 module.exports = router

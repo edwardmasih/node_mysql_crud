@@ -5,7 +5,7 @@ module.exports = {
 
     // get all employee list
     getEmployeeList: (req, res) => {
-        
+
         // using model function
 
         // EmployeeModel.getAllEmployees((err, employees)=>{
@@ -67,16 +67,20 @@ module.exports = {
         console.log("adding new Employee", req.body);
         let success = true;
         let employeeReqData = req.body;
+
+        employeeReqData.created_at = new Date();
+        employeeReqData.updated_at = new Date();
+
         for (const [key, value] of Object.entries(employeeReqData)) {
             // console.log(`${key}: ${value}`);
-            if (key == "created_at") {
-                employeeReqData.created_at = new Date();
-                continue;
-            }
-            if (key == "updated_at") {
-                employeeReqData.updated_at = new Date();
-                continue;
-            }
+            // if (key == "created_at") {
+            //     employeeReqData.created_at = new Date();
+            //     continue;
+            // }
+            // if (key == "updated_at") {
+            //     employeeReqData.updated_at = new Date();
+            //     continue;
+            // }
             if (!value.trim()) {
                 console.log(key, "empty, not getting all correct data");
                 success = false;
@@ -103,6 +107,58 @@ module.exports = {
                             success: success,
                             message: "Employee created successfully",
                             newEmployeeID: row.insertId,
+                            queryInfo : row
+                        });
+                    }
+                }
+            );
+        }
+    },
+
+    // update Employee
+    updateEmployee: (req, res) => {
+        console.log("updating Employee", req.body);
+        let success = true;
+        let employeeReqData = req.body;
+        let id = req.params.id;
+        for (const [key, value] of Object.entries(employeeReqData)) {
+            // console.log(`${key}: ${value}`);
+            if (!value.trim()) {
+                console.log(key, "empty, not getting all correct data");
+                success = false;
+                break;
+            }
+        }
+        console.log(employeeReqData, success);
+        if (success == false) {
+            res.status(400).send({
+                success: success,
+                message: "Some fields missing, please send all data",
+            });
+        } else {
+            dbConn.query(
+                "UPDATE employees SET first_name=?,last_name=?,email=?,phone=?,organization=?,designation=?,salary=? WHERE id = ?",
+                [
+                    employeeReqData.first_name,
+                    employeeReqData.last_name,
+                    employeeReqData.email,
+                    employeeReqData.phone,
+                    employeeReqData.organization,
+                    employeeReqData.designation,
+                    employeeReqData.salary,
+                    id,
+                ],
+
+                (err, row) => {
+                    if (err) {
+                        console.log("Error while updating data");
+                        res.send(err);
+                    } else {
+                        console.log("Employee updated successfully");
+                        res.send({
+                            success: success,
+                            message: "Employee updated successfully",
+                            queryInfo : row
                         });
                     }
                 }
