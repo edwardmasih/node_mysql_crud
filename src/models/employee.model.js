@@ -27,16 +27,33 @@ EmployeeModel.getAllEmployees = (result) => {
 };
 
 // get employee by id
-EmployeeModel.getEmployeeByID = (id,result) => {
+EmployeeModel.getEmployeeByID = (id, result) => {
     dbConn.query("SELECT * from employees WHERE id=?", [id], (err, row) => {
         if (err) {
             console.log("Error while fetching employee id " + id);
-            result(null,err);
+            result(null, err);
         } else {
             console.log(`Employeed Details of id ${id} fetched`);
-            result(null,row);
+            result(null, row);
         }
     });
+};
+
+// create new employee
+EmployeeModel.createEmployee = (employeeReqData, result) => {
+    dbConn.query(
+        "INSERT INTO employees SET ? ",
+        employeeReqData,
+        (err, res) => {
+            if (err) {
+                console.log("Error while inserting data");
+                result(null, err);
+            } else {
+                console.log("Employee created successfully");
+                result(null, res);
+            }
+        }
+    );
 };
 
 module.exports = EmployeeModel;

@@ -5,7 +5,7 @@ module.exports = {
 
     // get all employee list
     getEmployeeList: (req, res) => {
-
+        
         // using model function
 
         // EmployeeModel.getAllEmployees((err, employees)=>{
@@ -31,8 +31,8 @@ module.exports = {
 
     // get employee by id
     getEmployeeByID: (req, res) => {
-        
-        id = req.params.id
+
+        id = req.params.id;
 
         // using model function
 
@@ -49,12 +49,64 @@ module.exports = {
 
         dbConn.query("SELECT * from employees WHERE id=?", [id], (err, row) => {
             if (err) {
-                console.log("Error while fetching employee id "+ id);
+                console.log("SQL Error while fetching employee id " + id);
                 res.send(err);
             } else {
                 console.log(`Employeed Details of id ${id} fetched`);
-                res.send(row);
+                if (row == "") {
+                    res.send("Error while fetching employee id " + id);
+                } else {
+                    res.send(row);
+                }
             }
         });
+    },
+
+    // create new Employee
+    addNewEmployee: (req, res) => {
+        console.log("adding new Employee", req.body);
+        let success = true;
+        let employeeReqData = req.body;
+        for (const [key, value] of Object.entries(employeeReqData)) {
+            // console.log(`${key}: ${value}`);
+            if (key == "created_at") {
+                employeeReqData.created_at = new Date();
+                continue;
+            }
+            if (key == "updated_at") {
+                employeeReqData.updated_at = new Date();
+                continue;
+            }
+            if (!value.trim()) {
+                console.log(key, "empty, not getting all correct data");
+                success = false;
+                break;
+            }
+        }
+        console.log(employeeReqData, success);
+        if (success == false) {
+            res.status(400).send({
+                success: success,
+                message: "Some fields missing, please send all data",
+            });
+        } else {
+            dbConn.query(
+                "INSERT INTO employees SET ? ",
+                employeeReqData,
+                (err, row) => {
+                    if (err) {
+                        console.log("Error while inserting data");
+                        res.send(err);
+                    } else {
+                        console.log("Employee created successfully");
+                        res.send({
+                            success: success,
+                            message: "Employee created successfully",
+                            newEmployeeID: row.insertId,
+                        });
+                    }
+                }
+            );
+        }
     },
 };

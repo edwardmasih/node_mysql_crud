@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require("express");
+const bodyParser = require("body-parser")
 
 // creating app
 const app = express()
@@ -8,7 +9,8 @@ const app = express()
 const port = process.env.port || process.env.PORT;
 
 // middleware
-
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded())
 
 // root route
 app.get('/',(req,res)=>{
